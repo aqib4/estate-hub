@@ -7,7 +7,7 @@ import morgan from 'morgan';
 import tenantRoutes from './routes/tenantRoutes';
 import managerRoutes from './routes/managerRoutes';
 import { authMiddleware } from './middleware/authMiddleware';
-
+import propertyRoutes from './routes/propertyRoutes';
 // routes import
 
 // configuration
@@ -27,6 +27,7 @@ app.get("/", (req, res) => {
     res.send("Server is running");
 });
 // Tenant Routes
+app.use("/properties",propertyRoutes)
 app.use("/tenants", authMiddleware(["tenant"]), tenantRoutes);
 app.use("/managers", authMiddleware(["manager"]), managerRoutes);
 
