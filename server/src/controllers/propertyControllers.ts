@@ -10,8 +10,8 @@ export const getAllProperties = async (req: Request, res: Response): Promise<voi
 
         const {
             favoriteIds,
-             priceMin,
-             priceMax,
+            priceMin,
+            priceMax,
             beds,
             baths,
             propertyType,
@@ -83,13 +83,18 @@ export const getAllProperties = async (req: Request, res: Response): Promise<voi
 
           if(availbleFrom && availbleFrom !=='any'){
             const availbleFromDate= typeof availbleFrom === "string" ? availbleFrom :null;
-            whereConditions.push(
-                Prisma.sql`EXISTS (
-                    SELECT 1 FROM "Lease" l
-                    WHERE l."propertyId" = p.id
-                    AND l."startDate"<= ${date.toISOString()};
-                )`
-            );
+            if(availbleFromDate){
+              const date= new Date(availbleFromDate);
+              if(!isNaN(date.getTime())){ 
+                whereConditions.push(
+                  Prisma.sql`EXISTS (
+                      SELECT 1 FROM "Lease" l
+                      WHERE l."propertyId" = p.id
+                      AND l."startDate"<= ${date.toISOString()};
+                  )`
+              );
+              }
+            }
           }
             if(latitude && longitude){
                 const lat= parseFloat(latitude as string););
