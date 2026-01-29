@@ -1,7 +1,5 @@
-import SettingsForm from '@/components/SettingsForm/SettingsForm'
 import { useGetAuthUserQuery, useUpdateManagerSettingsMutation } from '@/state/api'
-import { userInfo } from 'os';
-import React, { use } from 'react'
+import SettingsForm from '@/components/SettingsForm/SettingsForm';
 
 type initialDataType = {
     name: string;
@@ -11,8 +9,8 @@ type initialDataType = {
 
 function Settings() {
     
-     const [updateManagerSettings]=useUpdateManagerSettingsMutation();
-     const {data:authUser,error}=useGetAuthUserQuery();
+     const [updateManagerSettings,isSubmitting]=useUpdateManagerSettingsMutation();
+     const {data:authUser}=useGetAuthUserQuery();
      console.log('Auth User Data:', authUser);
 
      const initialData:initialDataType =  {
@@ -26,14 +24,15 @@ function Settings() {
      }
 
 
-
-     
-
-
   return (
-    <SettingsForm  
-    
-    />
+    <div>
+      <SettingsForm 
+        initialData={initialData} 
+        onSubmit={handleSubmit} 
+        userType="manager" 
+        isSubmitting={false}
+      />
+    </div>
 
   )
 }
