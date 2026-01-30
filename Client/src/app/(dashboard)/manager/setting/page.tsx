@@ -9,7 +9,7 @@ type initialDataType = {
 
 function Settings() {
     
-     const [updateManagerSettings,isSubmitting]=useUpdateManagerSettingsMutation();
+     const [updateManagerSettings]=useUpdateManagerSettingsMutation();
      const {data:authUser}=useGetAuthUserQuery();
      console.log('Auth User Data:', authUser);
 
