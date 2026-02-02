@@ -96,14 +96,15 @@ export const getAllProperties = async (req: Request, res: Response): Promise<voi
               }
             }
           }
+
             if(latitude && longitude){
-                const lat= parseFloat(latitude as string););
+                const lat= parseFloat(latitude as string);
                 const lon= parseFloat(longitude as string);
                 const radiusInKm=1000;
                 const degrees= radiusInKm/111;
                 whereConditions.push(
                     Prisma.sql`ST_DWiwithin(
-                        l.coordinates::geomatry,
+                        l.coordinates:: geometry,
                         ST_SetSRID(ST_MakePoint(${lon},${lat},4326),
                         ${degrees}
                     )`
