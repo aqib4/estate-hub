@@ -113,34 +113,32 @@ export const getAllProperties = async (req: Request, res: Response): Promise<voi
           }
 
 
-            const completeQuery=Prisma.sql`
-            SELECT 
-            p.*,
-            json_build_object(
-                'id', l.id,
-                'address',l.address,
-                'city',l.city,
-                'state',l.state,
-                'country',l.country,
-                'postalCode',l."postalCode",
-                'coordinates',json_build_object(
-                    'longitude',ST_X(l."coordinates"::geomatry),
-                    'latitude',ST_Y(l."coordinates"::geomatry),
-                )
-            )as location
-            FROM 'property'
-            JOIN 'location' l ON p."locationId" = l.id
-            ${
-                whereConditions.length > 0
-                ? Prisma.sql`WHERE ${Prisma.join(whereConditions, "AND")}`
-                : Prisma.empty
-            }`;
+          const completeQuery = Prisma.sql`
+          SELECT 
+          p.*,
+          json_build_object(
+              'id', l.id,
+              'address', l.address,
+              'city', l.city,
+              'state', l.state,
+              'country', l.country,
+              'postalCode', l."postalCode",
+              'coordinates', json_build_object(
+                  'longitude', ST_X(l.coordinates::geometry),
+                  'latitude', ST_Y(l.coordinates::geometry)
+              )
+          ) as location
+          FROM "Property" p
+          JOIN "Location" l ON p."locationId" = l.id
+          ${
+              whereConditions.length > 0
+              ? Prisma.sql`WHERE ${Prisma.join(whereConditions, " AND ")}`
+              : Prisma.empty
+          }`;
 
         
        } catch (error:any) {
             res.status(500).json({message:`Internal Server Error: ${error.message}`});
        }
-
-
 
 }
