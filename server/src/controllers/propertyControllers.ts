@@ -70,7 +70,7 @@ export const getAllProperties = async (req: Request, res: Response): Promise<voi
 
           if(propertyType && propertyType !=='any'){
             whereConditions.push(
-                Prisma.sql`p."propretyType"= ${propertyType}::"propertyType"`
+                Prisma.sql`p."propretyType"= ${propertyType}::"PropertyType"`
             )
           }
             
