@@ -27,7 +27,7 @@ export const getAllProperties = async (req: Request, res: Response): Promise<voi
 
           if(favoriteIds){
             const favoriteIdsArrary = (favoriteIds as string).split(',').map(Number);
-            whereConditions.push(Prisma.sql`p.id IN (${Prisma.join(favoriteIdsArrary)})`
+            whereConditions.push(Prisma.sql`p.id IN (${Prisma.join(favoriteIdsArrary, ',')})`
             );
            }
 
