@@ -22,7 +22,7 @@ export const getAllProperties = async (req: Request, res: Response): Promise<voi
             latitude,
             longitude,
           }= req.query;
-
+         
           let whereConditions: Prisma.Sql[] = [];
 
           if(favoriteIds){
