@@ -136,6 +136,9 @@ export const getAllProperties = async (req: Request, res: Response): Promise<voi
               : Prisma.empty
           }`;
 
+          const properties= await prisma.$queryRaw(completeQuery);
+          res.json(properties);
+
         
        } catch (error:any) {
             res.status(500).json({message:`Internal Server Error: ${error.message}`});
