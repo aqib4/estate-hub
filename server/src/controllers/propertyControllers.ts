@@ -158,6 +158,11 @@ export const getProperty = async (req:Request,res:Response):Promise<void> =>{
                 },
             })
 
+            if (!property) {
+              res.status(404).json({ message: "Property not found" });
+              return;
+            }
+
             if(property){
               const coordinates: {coordinates: string } []= 
                await prisma.$queryRaw`SELECT ST_asText(coordinates) as coordinates from "Location" where id=${property.location.id}`
