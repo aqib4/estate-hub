@@ -1,6 +1,6 @@
 import { PrismaClient, Prisma } from '@prisma/client';
 import { Request, Response } from 'express';
-import wktToGeoJSON from 'wkt-to-geojson';
+import {wktToGeoJSON} from '@terraformer/wkt';
 
 const prisma = new PrismaClient();
 
@@ -163,11 +163,11 @@ export const getProperty = async (req:Request,res:Response):Promise<void> =>{
               return;
             }
 
-            if(property){
-              const coordinates: {coordinates: string } []= 
+       
+               const coordinates: {coordinates: string } []= 
                await prisma.$queryRaw`SELECT ST_asText(coordinates) as coordinates from "Location" where id=${property.location.id}`
               
-               const geoJSON:any =wktToGeoJSON(coordinates[0]?coordinates:"")
+               const geoJSON: any = wktToGeoJSON(coordinates[0] ? coordinates[0].coordinates : "")
                const longitude= geoJSON.coordinates[0];
                const latitude= geoJSON.coordinates[1];
               
@@ -179,11 +179,11 @@ export const getProperty = async (req:Request,res:Response):Promise<void> =>{
                   longitude,
                   latitude
                 }
-                }
-               };
+              }
+              }
 
                res.json(propertyWithCoordinates);
-              }
+              
        } catch (err:any) {
            res.status(500).json({message:`Error Retreiving property :${err.message}`})
        }
