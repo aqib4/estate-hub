@@ -228,7 +228,7 @@ export const createProperty = async (req:Request,res:Response):Promise<void> =>{
                  }).done();
 
                  return uploadResults.Location;
-            })
+            }));
            
           const geoCodingUrl = `https://nominatim.openstreetmap.org/search?${new URLSearchParams(
             {
