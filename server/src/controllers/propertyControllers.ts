@@ -262,7 +262,7 @@ export const createProperty = async (req:Request,res:Response):Promise<void> =>{
           `;
 
            const newProperty= await prisma.property.create({
-            data: {
+            data: { 
               ...propertyData,
               photoUrls,
               locationId: location.id,
@@ -288,7 +288,7 @@ export const createProperty = async (req:Request,res:Response):Promise<void> =>{
               location: true,
               manager: true
             }
-           })
+           });
 
            res.status(201).json(newProperty);
 

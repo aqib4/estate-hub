@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { wktToGeoJSON } from '@terraformer/wkt';
 import { Request, Response } from 'express';
 
 const prisma = new PrismaClient();
@@ -107,4 +108,57 @@ const updateManager = async (req: Request, res: Response): Promise<void> => {
 
 }
 
+const getManagerProperties= async (req:Request,res:Response): Promise<void> =>{
+      
+      try {
+        const {cognitoId}= req.params;
+        
+        if(!cognitoId){
+          res.status(400).json({message:"Manager ID is required"});
+          return;
+        }
+
+        const managerWithProperties = await prisma.manager.findUnique({
+           where: {cognitoId}
+        })
+
+        const properties= await prisma.property.findMany({
+          where : {managerCognitoId: cognitoId},
+          include : {
+            location: true,
+          }
+        })
+
+        const propertiesWithFormattedLocations=await Promise.all(
+                 properties.map(async (property)=> {
+                  const coordinates: {coordinates: string}[] = await prisma.$queryRaw `SELECT ST_asText(coordinates) as coordinates from "Location" where id=${property.location.id}`;
+                  const geoJson: any = wktToGeoJSON(coordinates[0] ? coordinates[0].coordinates : "");
+                  const longitude = geoJson.coordinates[0];
+                  const latitude = geoJson.coordinates[1];
+                  return {
+                    ...property,
+                    location: {
+                      ...property.location,
+                      coordinates: {
+                        longitude,
+                        latitude
+                      }
+                    }
+                  }
+                 })
+        )
+
+
+        res.status(200).json({
+          manager: managerWithProperties,
+          properties: propertiesWithFormattedLocations
+        })
+
+
+      }catch(err:any){
+        console.error("Error fetching manager properties:", err);
+        res.status(500).json({message:`Unable to fetch properties for the manager. Please try again later. Error: ${err.message}`});
+      }      
+
+}
 export { getManager, createManager, updateManager };
