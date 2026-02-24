@@ -161,4 +161,4 @@ const getManagerProperties= async (req:Request,res:Response): Promise<void> =>{
       }      
 
 }
-export { getManager, createManager, updateManager };
+export { getManager, createManager, updateManager, getManagerProperties };

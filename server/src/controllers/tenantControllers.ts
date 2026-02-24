@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { wktToGeoJSON } from '@terraformer/wkt';
 
 const prisma = new PrismaClient();
 
 const getTenant = async (req: Request, res: Response): Promise<void> => {
 
-    const { cognitoId } = req.params;
     try {
+    const { cognitoId } = req.params;
 
     if (!cognitoId) {
       res.status(400).json({ message: 'cognitoId is required' });
@@ -31,8 +32,28 @@ const getTenant = async (req: Request, res: Response): Promise<void> => {
 };
 
 const createTenant = async (req: Request, res: Response): Promise<void> => {
-  const { cognitoId, name, email, phoneNumber } = req.body;
   try {
+    const { cognitoId, name, email, phoneNumber } = req.body;
+      //check for empty fields
+      if(cognitoId==="" || name==="" || email==="" || phoneNumber==="") {
+        res.status(400).json({message:"Please fill in all fields"});
+        return;
+      }
+      // Validate email format
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        res.status(400).json({ message: "Invalid email format." });
+        return;
+      }
+      
+      // Check if tenant with the same cognitoId already exists
+      const existingTenant = await prisma.tenant.findUnique({
+        where: { cognitoId },
+      });
+      if (existingTenant) {
+        res.status(400).json({ message: "Tenant with this cognitoId already exists." });
+        return;
+      }
+      
     const tenant = await prisma.tenant.create({
       data: {
         cognitoId,
@@ -107,6 +128,52 @@ const updateTenant = async (req: Request, res: Response): Promise<void> => {
     });
   }
 };
+
+const getCurrentResidency= async (req:Request, res:Response): Promise<void> => {
+  
+  try{
+      const{ cognitoId }= req.params;
+      if(!cognitoId){
+        res.status(400).json({message:"cognitoId is required"});
+        return;
+      }
+      const properties= await prisma.property.findMany({
+         where : { tenants: {some : {cognitoId}}},
+          include: {
+            location: true,
+          }
+      })
+
+      const propertiesWithProperFormatesdLocation= await Promise.all(
+         properties.map(async (property)=> {
+           const coordinates: {coordinates:string} []= await prisma.$queryRaw` SELECT ST_asText(coordinates) as coordinates from "Location" where id=${property.location.id}`;
+           const geoJSON:any = wktToGeoJSON(coordinates[0] ? coordinates[0].coordinates : "");
+           const longitude= geoJSON.coordinates[0];
+           const latitude= geoJSON.coordinates[1]; 
+
+           return {
+            ...property,
+            location: {
+              ...property.location,
+              coordinates:{
+                longitude,
+                latitude
+              }
+            }
+           }
+         
+          })
+      )
+
+      res.json(propertiesWithProperFormatesdLocation);
+
+
+  }
+  catch(err:any){
+    res.status(500).json({message:`Error Retrieving Current Residency for tenant: ${err.message}`})
+  }
+
+}
 
 
 export { getTenant, createTenant, updateTenant };
