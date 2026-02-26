@@ -167,7 +167,6 @@ const getCurrentResidency= async (req:Request, res:Response): Promise<void> => {
 
       res.json(propertiesWithProperFormatesdLocation);
 
-
   }
   catch(err:any){
     res.status(500).json({message:`Error Retrieving Current Residency for tenant: ${err.message}`})
@@ -176,4 +175,4 @@ const getCurrentResidency= async (req:Request, res:Response): Promise<void> => {
 }
 
 
-export { getTenant, createTenant, updateTenant };
+export { getTenant, createTenant, updateTenant, getCurrentResidency };
