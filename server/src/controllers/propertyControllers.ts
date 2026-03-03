@@ -9,7 +9,7 @@ import { Location } from '@prisma/client';
 const prisma = new PrismaClient();
 
 const s3Client= new S3Client({
-    region: process.env.AWS_REGION,
+    region: process.env.AWS_REGION
 });
 
 
@@ -289,10 +289,11 @@ export const createProperty = async (req:Request,res:Response):Promise<void> =>{
               manager: true
             }
            });
-
+           console.log('New Property Created:', newProperty);
            res.status(201).json(newProperty);
 
        }catch(err:any){
             res.status(500).json({message:`Error creating property: ${err.message}`})
        }
 }
+
