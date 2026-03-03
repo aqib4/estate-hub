@@ -174,5 +174,74 @@ const getCurrentResidency= async (req:Request, res:Response): Promise<void> => {
 
 }
 
+const addFavouriteProperty= async (req:Request,res:Response): Promise<void> =>{
+   
+  try{
+       const {cognitoId,propertyId}=req.params;
+        if(!cognitoId || !propertyId){
+          res.status(400).json({message:"cognitoId and propertyId are required"});
+          return;
+        }
+        const tenant =await prisma.tenant.findUnique({
+          where:{cognitoId},
+          include:{favorites:true}
+        })
+        if(!tenant){
+          res.status(404).json({message:"Tenant not found"});
+          return;
+        }
+        const PropertyIdNum= Number(propertyId);
+        const existingFavourites= tenant?.favorites || [];
+        
+        if(!existingFavourites.some(fav=> fav.id===PropertyIdNum)){
+          const updatedTenant = await prisma.tenant.update({
+            where:{cognitoId},
+            data: {
+              favorites:{
+                connect: {id:PropertyIdNum}
+              }
+            }
+          });
+          res.json({
+            message:"Property added to favourites successfully",
+            updatedTenant
+          });
+        }else{
+          res.status(400).json({message:"Property already in favourites"});
+        }
 
-export { getTenant, createTenant, updateTenant, getCurrentResidency };
+  }catch(err:any){
+    res.status(500).json({message:`Error Adding Favourite Property: ${err.message}`})
+  }
+}
+
+const removeFavouriteProperty = async (req:Request,res:Response): Promise<void> =>{
+
+  try{
+      const {cognitoId,propertyId}= req.params;
+      if(!cognitoId || !propertyId){
+        res.status(400).json({message:"cognitoId and propertyId are required"});
+        return;
+      }
+      const PropertyIdNum= Number(propertyId);
+
+      const updatedTenant = await prisma.tenant.update({
+        where:{cognitoId},
+        data:{
+          favorites:{
+            disconnect:{id:PropertyIdNum}
+          }
+        }
+      });
+      res.json({
+        message:"Property removed from favourites successfully",
+        updatedTenant
+      });
+      
+  }
+  catch(err:any){
+    res.status(500).json({message:`Error Removing Favourite Property: ${err.message}`})
+  }
+}
+
+export { getTenant, createTenant, updateTenant, getCurrentResidency,addFavouriteProperty,removeFavouriteProperty };
