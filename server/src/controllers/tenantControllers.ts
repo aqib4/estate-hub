@@ -178,6 +178,7 @@ const addFavouriteProperty= async (req:Request,res:Response): Promise<void> =>{
    
   try{
        const {cognitoId,propertyId}=req.params;
+       console.log("Received addFavouriteProperty request with cognitoId:", cognitoId, "and propertyId:", propertyId);
         if(!cognitoId || !propertyId){
           res.status(400).json({message:"cognitoId and propertyId are required"});
           return;
