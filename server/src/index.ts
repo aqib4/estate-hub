@@ -8,6 +8,7 @@ import tenantRoutes from './routes/tenantRoutes';
 import managerRoutes from './routes/managerRoutes';
 import { authMiddleware } from './middleware/authMiddleware';
 import propertyRoutes from './routes/propertyRoutes';
+import leaseRoutes from './routes/leaseRoutes';
 // routes import
 
 // configuration
@@ -30,11 +31,10 @@ app.get("/", (req, res) => {
 app.use("/properties",propertyRoutes)
 app.use("/tenants", authMiddleware(["tenant"]), tenantRoutes);
 app.use("/managers", authMiddleware(["manager"]), managerRoutes);
-
+app.use("/leases",leaseRoutes);
 
 //server
 const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
-
