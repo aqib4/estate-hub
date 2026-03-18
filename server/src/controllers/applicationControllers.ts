@@ -6,7 +6,6 @@ const prisma= new PrismaClient();
  const listApplications = async(req:Request,res:Response):Promise<void> =>{
        try {
              const {userID,userType}= req.query;
-             console.log("UserID:", userID);
              let whereClause= {};
 
              if(userID && userType){
