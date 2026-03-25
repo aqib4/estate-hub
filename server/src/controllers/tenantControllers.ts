@@ -8,7 +8,7 @@ const getTenant = async (req: Request, res: Response): Promise<void> => {
 
     try {
     const { cognitoId } = req.params;
-
+    console.log("Received getTenant request with cognitoId:", cognitoId);
     if (!cognitoId) {
       res.status(400).json({ message: 'cognitoId is required' });
       return;
