@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 
 const prisma= new PrismaClient();
 
- const getLeases = async(req:Request,res:Response):Promise<void> =>{
+const getLeases = async(req:Request,res:Response):Promise<void> =>{
        try {
            const leases= await prisma.lease.findMany({
             include:{

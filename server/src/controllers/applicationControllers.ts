@@ -10,7 +10,9 @@ const prisma= new PrismaClient();
 
              if(userID && userType){
                 if(userType==="tenant"){
-                    whereClause = {tenantCognitoId: String(userID)};
+                    whereClause = {
+                        tenantCognitoId: String(userID)
+                    };
                 }
                 else if(userType==="manager"){
                     whereClause ={
@@ -19,7 +21,7 @@ const prisma= new PrismaClient();
                         }
                     }
                 }
-             }
+              }
 
              const applications= await prisma.application.findMany({
                 where: whereClause,
@@ -32,6 +34,21 @@ const prisma= new PrismaClient();
                     }
                 }
              })
+
+             function calculateNextPayments(startDate:Date):Date{
+                  const Today=new Date();
+                  const nextPaymentDate= new Date(startDate);
+
+                  while(nextPaymentDate <= Today){
+                    nextPaymentDate.setMonth(nextPaymentDate.getMonth()+1);
+                  }
+                    return nextPaymentDate;
+             }
+             
+             const formatApplications= await Promise.all(
+                app
+             )
+
 
              
        } catch (err:any) {
