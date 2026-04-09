@@ -118,6 +118,8 @@ model Tenant {
   leases       Lease[]
 }
 
+
+
 model Location {
   id          Int                                   @id @default(autoincrement())
   address     String
