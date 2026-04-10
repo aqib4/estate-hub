@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import { connect } from "http2";
 
 const prisma = new PrismaClient();
 
@@ -167,5 +166,35 @@ const createApplication = async (req: Request, res: Response): Promise<void> => 
         .status(500)
         .json({ message: `Error Creating application: ${err.message}` });
     }
+};
+
+const updateApplicationStatus= async (req: Request, res: Response): Promise<void> => {
+    try{
+        const {applicationId}=req.params;
+        const {status}=req.body;
+        
+        const application= await prisma.application.findUnique({
+          where: {id: Number(applicationId)},
+          include: {
+            property: true,
+            tenant: true,
+          }
+        })
+
+        if(!application){
+            res.status(404).json({message:"Application not found"});
+            return;
+        }
+
+        
+
+
+
+     }
+    catch(err:any){
+        res
+        .status(500)
+        .json({ message: `Error Updating application status: ${err.message}` });
     }
-export { listApplications };
+
+export { listApplications, createApplication };
