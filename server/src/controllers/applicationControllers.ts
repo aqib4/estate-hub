@@ -5,9 +5,10 @@ const prisma = new PrismaClient();
 
 const listApplications = async (req: Request, res: Response): Promise<void> => {
   try {
+
     const { userID, userType } = req.query;
     let whereClause = {};
-
+    
     if (userID && userType) {
       if (userType === "tenant") {
         whereClause = {
@@ -186,10 +187,45 @@ const updateApplicationStatus= async (req: Request, res: Response): Promise<void
             return;
         }
 
-        
 
 
+        if(status==="approved"){
 
+          const newlease=await prisma.lease.create({
+            data: {
+              startDate: new Date(),
+              endDate: new Date(
+                new Date().setFullYear(new Date().getFullYear() + 1)
+              ),
+              rent: application.property.pricePerMonth,
+              deposit: application.property.securityDeposit,
+              propertyId: application.propertyId,
+              tenantCognitoId: application.tenantCognitoId,
+            }
+          })
+
+
+          await prisma.property.update({
+             where:{ id: application.propertyId},
+             data: {
+              tenants : {
+                connect: { cognitoId: application.tenantCognitoId }
+              }
+             }
+          })
+
+          await prisma.application.update({
+            where: { id: Number(applicationId)},
+            data: { status , leaseId: newlease.id},
+            include: {
+              property: true,
+              tenant: true,
+              lease: true
+            }
+          })
+        }
+
+        res.status(200).json({message:"Application status updated successfully", application})
      }
     catch(err:any){
         res
@@ -197,4 +233,4 @@ const updateApplicationStatus= async (req: Request, res: Response): Promise<void
         .json({ message: `Error Updating application status: ${err.message}` });
     }
 
-export { listApplications, createApplication };
+export { listApplications, createApplication};

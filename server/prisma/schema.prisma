@@ -157,7 +157,7 @@ model Lease {
   deposit         Float
   propertyId      Int
   tenantCognitoId String
-
+  
   property    Property     @relation(fields: [propertyId], references: [id])
   tenant      Tenant       @relation(fields: [tenantCognitoId], references: [cognitoId])
   application Application?
