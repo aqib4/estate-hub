@@ -109,7 +109,7 @@ const createApplication = async (req: Request, res: Response): Promise<void> => 
         
         const newApplication= await prisma.$transaction(async (prisma) => {
             //create lease first
-            const least = await prisma.lease.create({
+            const lease = await prisma.lease.create({
                 data: {
                     startDate: new Date(),
                     endDate: new Date(
@@ -128,25 +128,17 @@ const createApplication = async (req: Request, res: Response): Promise<void> => 
              
             //then create application
             const application = await prisma.application.create({
-                data: {
-                    applicationDate: new Date(applicationDate),
-                    status,
-                    tenantCognitoId,
-                    propertyId,
-                    name,
-                    email,
-                    phoneNumber,
-                    message,
-                    property : {
-                    connect :{ id: propertyId} 
-                    },
-                    tenant: {
-                        connect: { cognitoId: tenantCognitoId }
-                    },
-                    lease: {
-                        connect: { id: least.id }
-                    }
-                },
+              data: {
+                applicationDate: new Date(applicationDate),
+                status,
+                name,
+                email,
+                phoneNumber,
+                message,
+                property: { connect: { id: propertyId } },
+                tenant: { connect: { cognitoId: tenantCognitoId } },
+                lease: { connect: { id: lease.id } }
+              },
                 include: {
                     property:true,
                     tenant:true,
@@ -223,9 +215,26 @@ const updateApplicationStatus= async (req: Request, res: Response): Promise<void
               lease: true
             }
           })
+        }else{
+          await prisma.application.update({
+            where: { id: Number(applicationId)},
+            data: { status }
+          })
         }
 
-        res.status(200).json({message:"Application status updated successfully", application})
+        //send updated application in response
+
+        const updatedApplication= await prisma.application.findUnique({
+          where: {id: Number(applicationId)},
+          include: {
+            property: true,
+            tenant: true,
+            lease: true
+          }
+        })
+
+        res.status(200).json({message:"Application status updated successfully", updatedApplication})
+
      }
     catch(err:any){
         res
@@ -233,4 +242,6 @@ const updateApplicationStatus= async (req: Request, res: Response): Promise<void
         .json({ message: `Error Updating application status: ${err.message}` });
     }
 
-export { listApplications, createApplication};
+}
+
+export { listApplications, createApplication, updateApplicationStatus };

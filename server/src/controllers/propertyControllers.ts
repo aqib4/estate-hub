@@ -4,12 +4,11 @@ import {wktToGeoJSON} from '@terraformer/wkt';
 import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import axios from 'axios';
-import { Location } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-const s3Client= new S3Client({
-    region: process.env.AWS_REGION
+const s3Client = new S3Client({
+  region: process.env.AWS_REGION || "us-east-1" // Provide a default region
 });
 
 
@@ -215,17 +214,17 @@ export const createProperty = async (req:Request,res:Response):Promise<void> =>{
 
           const photoUrls = await Promise.all(
             files.map(async (file)=>{
-                 const uploadParams = {
-                    Buckets: process.env.s3_Bucket_NAME!,
-                    Key: `properties/${Date.now()}-${file.originalname}`,
-                    Body: file.buffer,
-                    ContentType: file.mimetype,
-                 };
+              const uploadParams = {
+                Bucket: process.env.s3_Bucket_NAME!,
+                Key: `properties/${Date.now()}-${file.originalname}`,
+                Body: file.buffer,
+                ContentType: file.mimetype,
+             };
 
-                 const uploadResults = await new Upload({
-                    client: s3Client,
-                    params: uploadParams,
-                 }).done();
+             const uploadResults = await new Upload({
+                client: s3Client,
+                params: uploadParams,
+             }).done();
 
                  return uploadResults.Location;
             }));
