@@ -6,6 +6,6 @@ const router = Router();
 
 router.get("/",authMiddleware(['manager','tenant']), listApplications);
 router.post("/",authMiddleware(['tenant']),createApplication);
-router.put("/:id/status",authMiddleware(['manager']),updateApplicationStatus);
+router.put("/:id/sstatus",authMiddleware(['manager']),updateApplicationStatus);
 
-export default router;
+export default router;  
