@@ -35,7 +35,7 @@ const createTenant = async (req: Request, res: Response): Promise<void> => {
   try {
     const { cognitoId, name, email, phoneNumber } = req.body;
       //check for empty fields
-      if(cognitoId==="" || name==="" || email==="" || phoneNumber==="") {
+      if(cognitoId==="" || name==="" || email==="" ) {
         res.status(400).json({message:"Please fill in all fields"});
         return;
       }

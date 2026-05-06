@@ -110,7 +110,7 @@ export const api = createApi({
               }
             };
           }
-          
+          console.log('Fetched user details from API:', userDetailsResponse.data);
           const userData: User = {
             cognitoInfo: {
               username: currentLoginUser.username,
@@ -120,7 +120,7 @@ export const api = createApi({
             userInfo: userDetailsResponse.data as Tenant | Manager,
             userRole
           };
-          
+          console.log('Fetched Auth User Data:', userData);
           return { data: userData };
           
         } catch (error) {

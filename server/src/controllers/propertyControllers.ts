@@ -4,6 +4,7 @@ import {wktToGeoJSON} from '@terraformer/wkt';
 import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import axios from 'axios';
+import { Location } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -264,7 +265,7 @@ export const createProperty = async (req:Request,res:Response):Promise<void> =>{
             data: { 
               ...propertyData,
               photoUrls,
-              locationId: location.id,
+              locationId: location?.id ,
               managerCognitoId,
               amenities:
               typeof propertyData.amenities === "string"
@@ -273,7 +274,7 @@ export const createProperty = async (req:Request,res:Response):Promise<void> =>{
               highlights:
               typeof propertyData.highlights === "string"
               ? propertyData.highlights.split(',')
-              : [],
+              : [], 
               isPetsAllowed: propertyData.isPetsAllowed === 'true',
               isParkingIncluded: propertyData.isParkingIncluded === 'true',
               pricePerMonth: parseFloat(propertyData.pricePerMonth),
